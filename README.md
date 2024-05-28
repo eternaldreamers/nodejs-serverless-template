@@ -1,1 +1,1 @@
-# Nodejs template
+# Nodejs severless template

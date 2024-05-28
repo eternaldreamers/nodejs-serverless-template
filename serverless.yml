@@ -1,0 +1,46 @@
+service: serverless-sqs-typescript-app
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  environment:
+    SQS_QUEUE_URL: ${self:custom.queueUrl}
+
+functions:
+  producer:
+    handler: dist/producer.handler
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - MyQueue
+              - Arn
+          batchSize: 1
+
+  consumer:
+    handler: dist/consumer.handler
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - MyQueue
+              - Arn
+          batchSize: 1
+
+resources:
+  Resources:
+    MyQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: MyQueue
+
+custom:
+  queueUrl:
+    Ref: MyQueue
+
+plugins:
+  - serverless-offline
+
+package:
+  individually: true
+
